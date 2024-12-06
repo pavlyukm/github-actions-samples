@@ -1,0 +1,6 @@
+namespace: python-app-blue
+images:
+  - name: my-docker-image
+    newTag: latest
+patchesStrategicMerge:
+  - patch-blue.yaml
