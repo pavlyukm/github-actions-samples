@@ -107,28 +107,20 @@ jobs:
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION"
 
-    - name: Create namespace & set in Kustomize
+    - name: Create blue/green namespace
       run: |
-         namespacePresentBlue=`kubectl get ns | grep python-app-blue | wc -l`
-         namespacePresentGreen=`kubectl get ns | grep python-app-green | wc -l`
-         if [ $namespacePresentBlue -eq 0 ]
-         then
-            kubectl create ns python-app-blue
-            cd k8s
-            kustomize edit set namespace python-app-blue
-            echo "NEW_NAMESPACE=python-app-blue" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-green" >> $GITHUB_ENV
-         elif [ $namespacePresentGreen -eq 0 ]
-         then
-            kubectl create ns python-app-green
-            cd k8s
-            kustomize edit set namespace python-app-green
-            echo "NEW_NAMESPACE=python-app-green" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-blue" >> $GITHUB_ENV
-         else
-            echo "Both Blue and Green namespaces are present! Exiting"
-            exit 1
-         fi
+        if ! kubectl get namespace python-app-blue >/dev/null 2>&1; then
+          kubectl create namespace python-app-blue
+          echo "NEW_NAMESPACE=python-app-blue" >> $GITHUB_ENV
+          echo "OLD_NAMESPACE=python-app-green" >> $GITHUB_ENV
+        elif ! kubectl get namespace python-app-green >/dev/null 2>&1; then
+          kubectl create namespace python-app-green
+          echo "NEW_NAMESPACE=python-app-green" >> $GITHUB_ENV
+          echo "OLD_NAMESPACE=python-app-blue" >> $GITHUB_ENV
+        else
+          echo "Error: Both namespaces already exist. Exiting."
+          exit 1
+        fi
 
     - name: Update Kubernetes resources
       env:
