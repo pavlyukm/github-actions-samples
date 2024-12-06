@@ -10,4 +10,4 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: elisska/hello-gitops:blue  # Unique image tag for blue
+          image: pavlyukm/hello-gitops:blue  # Unique image tag for blue
