@@ -1,0 +1,6 @@
+namespace: python-app-green
+images:
+  - name: my-docker-image
+    newTag: latest
+patchesStrategicMerge:
+  - patch-green.yaml
